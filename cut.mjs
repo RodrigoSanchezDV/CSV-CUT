@@ -1,7 +1,7 @@
 /* Setear con el numero de cuantas filas se quieren las partes del CSV */
-const linesPerFile = 10;
+const linesPerFile = 5;
 /* Setear con el nombre del archivo csv que se desea cortar */
-const sourceFilePath = 'oportunidades_fecha_inscrito.csv';
+const sourceFilePath = '.csv';
 
 const outputDirectory = `${sourceFilePath.replace(/\.[^.]+$/, '')}_parts/`;
 
@@ -12,9 +12,7 @@ if (!fs.existsSync(outputDirectory)) {
   fs.mkdirSync(outputDirectory);
 }
 
-
 const readStream = fs.createReadStream(sourceFilePath);
-
 
 const rl = readline.createInterface({
   input: readStream,
@@ -27,27 +25,25 @@ let lineCount = 0;
 let currentFileIndex = 1;
 let currentWriteStream = createWriteStream();
 
-
 rl.on('line', (line) => {
   if (isFirstLine) {
     header = line;
     isFirstLine = false;
+    return
   }
 
-  if (lineCount === 0) {
+  if(lineCount === 0){
     currentWriteStream = createWriteStream();
     currentWriteStream.write(header + '\n');
-  } else {
-    currentWriteStream.write(line + '\n');
   }
-  
+  currentWriteStream.write(line + '\n');
+
   lineCount++
   if (lineCount >= linesPerFile) {
     currentWriteStream.end();
     lineCount = 0;
     currentFileIndex++;
   }
-
 });
 
 rl.on('close', () => {
